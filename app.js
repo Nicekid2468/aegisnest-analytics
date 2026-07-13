@@ -401,7 +401,7 @@
     if (maxScroll > 0) {
       const SCROLL_HOLD_AT_TOP = 0.6; // let the first few rows register before moving
       const SCROLL_HOLD_AT_BOTTOM = 0.8; // settle on the last row before the timeline ends
-      const scrollDuration = gsap.utils.clamp(6, 16, tradeRows.length * 0.035);
+      const scrollDuration = gsap.utils.clamp(14, 30, tradeRows.length * 0.07);
 
       tl.to(dom.tradesList, {
         scrollTop: maxScroll,
