@@ -1,0 +1,405 @@
+/* ==========================================================================
+   Aegisnest Analytics — styles.css
+   1080x1920 fixed capture canvas. Frosted glassmorphism, dark mode.
+   Scaling for on-screen preview is handled mathematically in app.js —
+   nothing in here should rely on vw/vh/% viewport units for layout.
+   ========================================================================== */
+
+:root {
+  --bg-base: #05050A;
+  --indigo-deep: #241454;
+  --indigo-mid: #4B2E9E;
+  --magenta-deep: #4A0E3C;
+  --magenta-mid: #8E2A6B;
+  --accent-violet: #B79CFF;
+  --accent-pink: #FF7CD4;
+
+  --text-primary: #F5F3FF;
+  --text-muted: rgba(245, 243, 255, 0.55);
+  --text-faint: rgba(245, 243, 255, 0.32);
+
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-strong: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 24px;
+  --glass-radius: 32px;
+
+  --positive: #4CE0A0;
+  --negative: #FF6B8B;
+
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-base);
+}
+
+body {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Canvas lock — exact 1080x1920, absolute positioned. No flex/grid centering.
+   ========================================================================== */
+
+#canvas-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 900px 700px at 22% 12%, var(--indigo-mid) 0%, transparent 60%),
+    radial-gradient(ellipse 800px 900px at 82% 30%, var(--magenta-mid) 0%, transparent 55%),
+    radial-gradient(ellipse 1000px 800px at 50% 100%, var(--indigo-deep) 0%, transparent 65%),
+    var(--bg-base);
+}
+
+/* Ambient glow orbs — soft floating light behind the glass, above the base gradient */
+.ambient-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.glow-indigo {
+  width: 640px;
+  height: 640px;
+  top: -120px;
+  left: -160px;
+  background: radial-gradient(circle, var(--indigo-mid) 0%, transparent 70%);
+}
+
+.glow-magenta {
+  width: 720px;
+  height: 720px;
+  bottom: 180px;
+  right: -220px;
+  background: radial-gradient(circle, var(--magenta-mid) 0%, transparent 70%);
+}
+
+/* ==========================================================================
+   Watermark — dead-centered behind glass panels, above the background
+   ========================================================================== */
+
+#watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 168px;
+  letter-spacing: 4px;
+  color: rgba(255, 255, 255, 0.035);
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  transform: rotate(-8deg);
+}
+
+/* ==========================================================================
+   Shared glass panel base
+   ========================================================================== */
+
+.glass-panel {
+  position: relative;
+  z-index: 3;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 48px 0 48px;
+}
+
+.panel-title {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+}
+
+.panel-tag {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+}
+
+/* ==========================================================================
+   Top header
+   ========================================================================== */
+
+#top-header {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 140px;
+  padding: 0 56px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand-name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--text-primary);
+}
+
+.brand-name-thin {
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 6px;
+  color: var(--text-muted);
+}
+
+.session-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+}
+
+.session-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--positive);
+  box-shadow: 0 0 16px 4px rgba(76, 224, 160, 0.6);
+}
+
+/* ==========================================================================
+   Hero — Total Portfolio Value
+   ========================================================================== */
+
+#hero {
+  position: relative;
+  z-index: 3;
+  padding: 12px 56px 0 56px;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 6px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.hero-value {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  font-size: 140px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  line-height: 1;
+  background: linear-gradient(180deg, #FFFFFF 0%, #D9CFFF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 40px rgba(183, 156, 255, 0.35));
+}
+
+.hero-currency {
+  font-size: 72px;
+  font-weight: 600;
+  margin-top: 22px;
+}
+
+.hero-sub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 28px;
+  font-size: 30px;
+}
+
+.hero-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--positive);
+}
+
+.hero-delta.is-negative {
+  color: var(--negative);
+}
+
+.hero-delta-arrow {
+  font-size: 22px;
+}
+
+.hero-sub-divider {
+  color: var(--text-faint);
+}
+
+.hero-range-label {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Chart panel
+   ========================================================================== */
+
+#chart-panel {
+  margin: 56px 48px 0 48px;
+  height: 620px;
+}
+
+#chart-container {
+  width: 100%;
+  height: 480px;
+  padding: 24px 48px 40px 48px;
+}
+
+#equity-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+#equity-line-path {
+  stroke-dasharray: 3000;
+  stroke-dashoffset: 3000;
+}
+
+#equity-cursor-dot {
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.9));
+}
+
+/* ==========================================================================
+   Trades panel
+   ========================================================================== */
+
+#trades-panel {
+  margin: 40px 48px 0 48px;
+  height: 620px;
+  overflow: hidden;
+}
+
+#trades-list {
+  height: calc(100% - 108px);
+  margin-top: 16px;
+  padding: 0 48px 32px 48px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.trade-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.trade-row:last-child {
+  border-bottom: none;
+}
+
+.trade-ticket {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  min-width: 200px;
+}
+
+.trade-action {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 6px 22px;
+  border-radius: 999px;
+  text-align: center;
+  min-width: 140px;
+}
+
+.trade-action--buy {
+  color: var(--positive);
+  background: rgba(76, 224, 160, 0.12);
+  border: 1px solid rgba(76, 224, 160, 0.3);
+}
+
+.trade-action--sell {
+  color: var(--negative);
+  background: rgba(255, 107, 139, 0.12);
+  border: 1px solid rgba(255, 107, 139, 0.3);
+}
+
+.trade-pnl {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 600;
+  min-width: 220px;
+  text-align: right;
+}
+
+.trade-pnl--pos {
+  color: var(--positive);
+}
+
+.trade-pnl--neg {
+  color: var(--negative);
+}
